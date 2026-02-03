@@ -11,7 +11,7 @@ load_dotenv()
 ca = certifi.where()
 
 class MongoDBClient:
-    def __init__(self, database_name="ineuron", collection_name="customer_segmentation"):
+    def __init__(self, database_name="customer_db", collection_name="customer_categorizer"):
         try:
             # Get MongoDB connection URL from environment variable
             mongo_db_url = os.getenv("MONGODB_URL_KEY")

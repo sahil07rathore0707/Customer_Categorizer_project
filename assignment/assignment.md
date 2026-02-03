@@ -1,4 +1,4 @@
-![alt text](https://ineuron.ai/images/ineuron-logo.png)
+![alt text](../docs/68747470733a2f2f696e6575726f6e2e61692f696d616765732f696e6575726f6e2d6c6f676f2e706e67.png)
 
 # Assignment for Customer Segmentation Project
 
