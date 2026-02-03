@@ -22,12 +22,6 @@ Dataset used
 4. Docker
 5. MongoDB
 
-## Infrastructure required
-
-1. AWS S3
-2. Azure
-3. Github Actions
-
 ## How to run
 
 Before you run this project make sure you have MongoDB Atlas account and you have the shipping dataset into it.
@@ -66,16 +60,8 @@ Step 4. Export the environment variable
 
 ```bash
 
-export AWS_ACCESS_KEY_ID=<AWS_ACCESS_KEY_ID>
-
-
-export AWS_SECRET_ACCESS_KEY=<AWS_SECRET_ACCESS_KEY>
-
-
-export AWS_DEFAULT_REGION=<AWS_DEFAULT_REGION>
-
-
-export MONGODB_URL= <MONGODB_URL>
+export MONGODB_URL=<MONGODB_URL>
+export MONGODB_URL_KEY=<MONGODB_URL_KEY>
 
 
 ```
@@ -92,7 +78,7 @@ Step 6. Train application
 
 ```bash
 
-http://localhost:5000/train
+http://127.0.0.1:8063/train
 
 ```
 
@@ -100,7 +86,7 @@ Step 7. Prediction application
 
 ```bash
 
-http://localhost:5000/predict
+http://127.0.0.1:8063/
 
 ```
 
@@ -111,7 +97,7 @@ http://localhost:5000/predict
 
 ```
 
-docker build --build-arg AWS_ACCESS_KEY_ID=<AWS_ACCESS_KEY_ID> --build-arg AWS_SECRET_ACCESS_KEY=<AWS_SECRET_ACCESS_KEY> --build-arg AWS_DEFAULT_REGION=<AWS_DEFAULT_REGION> --build-arg MONGODB_URL=<MONGODB_URL> . 
+docker build --build-arg MONGODB_URL=<MONGODB_URL> --build-arg MONGODB_URL_KEY=<MONGODB_URL_KEY> . 
 
 ```
 
@@ -119,7 +105,7 @@ docker build --build-arg AWS_ACCESS_KEY_ID=<AWS_ACCESS_KEY_ID> --build-arg AWS_S
 
 ```
 
-docker run -d -p 5000:5000 <IMAGE_NAME>
+docker run -d -p 8063:8063 <IMAGE_NAME>
 
 ```
 
@@ -130,10 +116,6 @@ docker run -d -p 5000:5000 <IMAGE_NAME>
 ## Data Collection Architecture -
 
 ![WhatsApp Image 2022-09-22 at 15 29 10](https://user-images.githubusercontent.com/71321529/192721926-de265f9b-f301-4943-ac7d-948bff7be9a0.jpeg)
-
-## Deployment Architecture -
-
-![deployment](https://user-images.githubusercontent.com/104005791/199660875-c8e63457-432a-44cb-8a95-800870f3da15.png)
 
 ## Models Used
 
