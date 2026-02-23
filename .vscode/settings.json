@@ -1,0 +1,7 @@
+{
+    "python.defaultInterpreterPath": "C:\\Users\\Sahil Rathore\\.conda\\envs\\venv\\python.exe",
+    "python.analysis.extraPaths": [
+        "./src"
+    ],
+    "python.Terminal.activateEnvironment": true
+}

@@ -9,7 +9,7 @@ import os
 
 from src.pipeline.prediction_pipeline import PredictionPipeline
 from src.pipeline.train_pipeline import TrainPipeline
-from src.constant.application import *
+from src.constant.application import APP_HOST, APP_PORT
 
 import warnings
 warnings.filterwarnings('ignore')
@@ -94,12 +94,17 @@ async def predictGetRouteClient(request: Request):
         return JSONResponse(content={"status": False, "error": str(e)}, status_code=500)
 
 
-# ✅ Predict API (JSON Input)
+# ✅ Predict API (Form Input)
 @app.post("/")
-async def predictRouteClient(data: CustomerData):
+async def predictRouteClient(request: Request):
     try:
+        form_data = await request.form()
+        # Convert form data to dict so Pydantic can parse and coerce types
+        form_dict = {k: v for k, v in form_data.items()}
+        data = CustomerData(**form_dict)
 
-        print("Received data:", data.dict())  # Debugging step
+        print("Received data:", data.dict())
+
         # Convert JSON to list format expected by model
         input_data = [
             data.Age, data.Education, data.Marital_Status, data.Parental_Status, data.Children,
@@ -111,11 +116,14 @@ async def predictRouteClient(data: CustomerData):
         # Run prediction
         prediction_pipeline = PredictionPipeline()
         predicted_cluster = prediction_pipeline.run_pipeline(input_data=input_data)
-        #return {"message": "Prediction received", "data": data.dict()}
-        resp={"predicted_cluster": int(predicted_cluster[0])}
-        return JSONResponse(content=resp)
+        
+        predicted_value = int(predicted_cluster[0])
+        
+        return templates.TemplateResponse(
+            "customer.html",
+            {"request": request, "context": predicted_value}
+        )
 
-    
     except Exception as e:
         return JSONResponse(content={"status": False, "error": str(e)}, status_code=500)
 
