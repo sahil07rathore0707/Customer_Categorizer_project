@@ -1,160 +1,172 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
+
+<head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Customer Segmentation</title>
-    <link rel="stylesheet" href="{{ url_for('static', path='/css/style.css')}}">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-iYQeCzEYFbKjA/T2uDLTpkwGzCiq6soy8tYaI1GyVh/UjpbCx/TYkiZhlZB6+fzT" crossorigin="anonymous">
-  </head>
-  <body>
-    <nav class="navbar navbar-light bg-light static-top">
-        <div class="container-fluid">
-           <span class="navbar-brand fw-bold">Customer Categorizer</span>
+    <link rel="stylesheet" href="{{ url_for('static', path='css/style.css')}}?v=1.0">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.1/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+
+<body>
+    <nav class="navbar static-top">
+        <div class="container text-center">
+            <span class="navbar-brand fw-bold mx-auto">CUSTOMER CATEGORIZER</span>
         </div>
-     </nav>
-    <section>
-        <div class="container-fluid">
-            <div class="container">
-                <form action="/" method="post">
-                    <legend>Customer Segmentation</legend>
-                    <div class="mb-3">
-                        <label for="Age">Age</label>
-                        <input type="number" class="form-control" id="Age" name="Age"  placeholder="Customer Age" required="required">
-                      </div>
-        
-                      <div class="mb-3">
-                        <label for="Education">Education of customer</label>
-                        <select class="form-control" id="Education" name="Education" placeholder="Education of Customer" required="required">
-                            <option value="" disabled selected>Select Education</option>
-                            <option value="0">Basic</option>
-                            <option value="1">2n Cycle</option>
-                            <option value = "2">Graduation</option>
-                            <option value = "3">Master</option>
-                            <option value = "4">PhD</option>
-                        </select>
-                      </div>
-        
-                      <div class="mb-3">
-                        <label for="Marital_Status">Married</label>
-                        <select class="form-control" id="Marital_Status" name="Marital_Status" placeholder="Is married" required="required">
-                            <option value="" disabled selected>Is married</option>
-                            <option value="0">N</option>
-                            <option value = "1">Y</option>
-                        </select>
-                      </div>
-        
-                      <div class="mb-3">
-                        <label for="Parental_Status">Has Kids</label>
-                        <select class="form-control" id="Parental_Status" name="Parental_Status" placeholder="Parental_Status" required="required">
-                            <option value="" disabled selected>Has kids</option>
-                            <option value = "0">N</option>
-                            <option value = "1">Y</option>
-                        </select>
-                      </div>
-        
-                      <div class="mb-3">
-                        <label for="Children">Number of Children</label>
-                        <input type="number" class="form-control" id="Children" name="Children"  placeholder="No of Children" required = "required">
-                      </div>
-                      
-                      <div class="mb-3">
-                        <label for="Income">Income of customer</label>
-                            <label for="company_age">Income of customer</label>
-                            <input type="number" class="form-control" id="Income" name="Income"  placeholder="Customer income" required="required">
-                          </div>
-        
-                      <div class="mb-3">
-                        <label for="Total_Spending">Total money Spending </label>
-                        <input type="number" class="form-control" id="Total_Spending" name="Total_Spending"  placeholder="Total money spending" required="required">
-                      </div>
+    </nav>
 
-                      <div class="mb-3">
-                        <label for="Days_as_Customer">Days of being customer</label>
-                        <input type="number" class="form-control" id="Days_as_Customer" name="Days_as_Customer"  placeholder="Days of being customer" required="required">
-                      </div>
-                      
-                      <div class="mb-3">
-                        <label for="Recency">Number of days since customer's last purchase</label>
-                        <input type="number" class="form-control" id="Recency" name="Recency"  placeholder="Number of days since customer's last purchase" required="required">
-                      </div>
+    <section class="main-section">
+        <div class="container">
+            <div class="row justify-content-center">
+                <div class="col-lg-8 col-md-10">
+                    <div class="glass-container">
+                        <form action="/" method="post">
+                            <legend>Customer Segmentation</legend>
 
-                      
+                            <div class="row g-3">
+                                <!-- Demographic Information -->
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label" for="Age">Age</label>
+                                    <input type="number" class="form-control" id="Age" name="Age" placeholder="e.g. 35"
+                                        required>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label" for="Education">Education Level</label>
+                                    <select class="form-control" id="Education" name="Education" required>
+                                        <option value="" disabled selected>Select Education</option>
+                                        <option value="0">Basic</option>
+                                        <option value="1">2n Cycle</option>
+                                        <option value="2">Graduation</option>
+                                        <option value="3">Master</option>
+                                        <option value="4">PhD</option>
+                                    </select>
+                                </div>
 
-                      <div class="mb-3">
-                        <label for="'Wines'">Amount spent on wine in last 2 years</label>
-                        <input type="number" class="form-control" id="Wines" name="Wines"  placeholder="Amount spent on wine in last 2 years" required="required">
-                      </div>
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label" for="Marital_Status">Married Status</label>
+                                    <select class="form-control" id="Marital_Status" name="Marital_Status" required>
+                                        <option value="" disabled selected>Are they married?</option>
+                                        <option value="0">No</option>
+                                        <option value="1">Yes</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label" for="Parental_Status">Has Dependents/Kids</label>
+                                    <select class="form-control" id="Parental_Status" name="Parental_Status" required>
+                                        <option value="" disabled selected>Has kids?</option>
+                                        <option value="0">No</option>
+                                        <option value="1">Yes</option>
+                                    </select>
+                                </div>
 
-                      <div class="mb-3">
-                        <label for="Fruits">Amount spent on Fruits in last 2 years</label>
-                        <input type="number" class="form-control" id="Fruits" name="Fruits"  placeholder="Amount spent on Fruits in last 2 years" required="required">
-                      </div>
-                      <div class="mb-3">
-                        <label for="Meat">Amount spent on Meat in last 2 years</label>
-                        <input type="number" class="form-control" id="Meat" name="Meat"  placeholder="Amount spent on Meat in last 2 years" required="required">
-                      </div>
-                      <div class="mb-3">
-                        <label for="Fish">Amount spent on Fish in last 2 years</label>
-                        <input type="number" step="0.01" class="form-control" id="Fish" name="Fish"  placeholder="Amount spent on Fish in last 2 years" required="required">
-                      </div>
-                      <div class="mb-3">
-                        <label for="Sweets">Amount spent on Sweets in last 2 years</label>
-                        <input type="number" class="form-control" id="Sweets" name="Sweets"  placeholder="Amount spent on Sweets in last 2 years" required="required">
-                      </div>
-                      <div class="mb-3">
-                        <label for="Gold">Amount spent on Gold in last 2 years</label>
-                        <input type="number" class="form-control" id="Gold" name="Gold"  placeholder="Amount spent on Gold in last 2 years" required="required">
-                      </div>
-                      <div class="mb-3">
-                        <label for="Web">Number of purchases made through the company’s website </label>
-                        <input type="number" class="form-control" id="Web" name="Web"  placeholder="Number of purchases made through the company’s website " required="required">
-                      </div>
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label" for="Children">Total Number of Children</label>
+                                    <input type="number" class="form-control" id="Children" name="Children"
+                                        placeholder="0" required>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label" for="Income">Annual Household Income ($)</label>
+                                    <input type="number" class="form-control" id="Income" name="Income"
+                                        placeholder="e.g. 50000" required>
+                                </div>
 
-                      <div class="mb-3">
-                        <label for="Catalog"> Number of purchases made using a catalogue
-                        </label>
-                        <input type="number" class="form-control" id="Catalog" name="Catalog"  placeholder="Number of purchases made using a catalogue " required="required">
-                      </div>
-                      <div class="mb-3">
-                        <label for="Store">Number of purchases made directly in stores </label>
-                        <input type="number" class="form-control" id="Store" name="Store"  placeholder="Number of purchases made directly in stores " required="required">
-                      </div>
-                      <div class="mb-3">
-                        <label for="Discount_Purchases">Number of purchases made with a discount</label>
-                        <input type="number" class="form-control" id="Discount_Purchases" name="Discount_Purchases"  placeholder="Number of purchases made with a discount" required="required">
-                      </div>
-                      <div class="mb-3">
-                        <label for="Total_Promo">Number of promotion offers customer has accepted</label>
-                        <input type="number" class="form-control" id="Total_Promo" name="Total_Promo"  placeholder="Number of promotion offers customer has accepted" required="required">
-                      </div>
-                      
+                                <!-- Behavior Information -->
+                                <div class="col-12 mb-3">
+                                    <hr style="border-color: var(--border-accent)">
+                                    <h5 class="text-center mb-4" style="color: var(--accent-primary)">Spending & Loyalty
+                                        Habits</h5>
+                                </div>
 
-                      <div class="mb-3">
-                        <label for="NumWebVisitsMonth">Number of visits to company’s website in the last month</label>
-                        <input type="number" class="form-control" id="NumWebVisitsMonth" name="NumWebVisitsMonth"  placeholder="Number of visits to company’s website in the last month" required="required">
-                      </div>
-                      
-        
-                        <input class="btn btn-primary" type="submit" value="Predict Customer Cluster" required />
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label" for="Total_Spending">Lifetime Total Spending</label>
+                                    <input type="number" class="form-control" id="Total_Spending" name="Total_Spending"
+                                        placeholder="Total spending amount" required>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label" for="Days_as_Customer">Customer Tenure (Days)</label>
+                                    <input type="number" class="form-control" id="Days_as_Customer"
+                                        name="Days_as_Customer" placeholder="Days active" required>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label" for="Recency">Days Since Last Purchase</label>
+                                    <input type="number" class="form-control" id="Recency" name="Recency"
+                                        placeholder="Recency period" required>
+                                </div>
+
+                                <!-- Detailed Expenditures -->
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label" for="Wines">Spent on Wines ($)</label>
+                                    <input type="number" class="form-control" id="Wines" name="Wines"
+                                        placeholder="In last 2 years" required>
+                                </div>
+                                <div class="col-md-4 mb-3">
+                                    <label class="form-label" for="Fruits">Fruits ($)</label>
+                                    <input type="number" class="form-control" id="Fruits" name="Fruits" required>
+                                </div>
+                                <div class="col-md-4 mb-3">
+                                    <label class="form-label" for="Meat">Meat ($)</label>
+                                    <input type="number" class="form-control" id="Meat" name="Meat" required>
+                                </div>
+                                <div class="col-md-4 mb-3">
+                                    <label class="form-label" for="Fish">Fish ($)</label>
+                                    <input type="number" step="0.01" class="form-control" id="Fish" name="Fish"
+                                        required>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label" for="Sweets">Sweets ($)</label>
+                                    <input type="number" class="form-control" id="Sweets" name="Sweets" required>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label" for="Gold">Luxury/Gold Items ($)</label>
+                                    <input type="number" class="form-control" id="Gold" name="Gold" required>
+                                </div>
+
+                                <!-- Channels -->
+                                <div class="col-md-4 mb-3">
+                                    <label class="form-label" for="Web">Web Orders</label>
+                                    <input type="number" class="form-control" id="Web" name="Web" required>
+                                </div>
+                                <div class="col-md-4 mb-3">
+                                    <label class="form-label" for="Catalog">Catalog Orders</label>
+                                    <input type="number" class="form-control" id="Catalog" name="Catalog" required>
+                                </div>
+                                <div class="col-md-4 mb-3">
+                                    <label class="form-label" for="Store">Store Purchases</label>
+                                    <input type="number" class="form-control" id="Store" name="Store" required>
+                                </div>
+
+                                <!-- Offers -->
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label" for="Discount_Purchases">Discount Deals Taken</label>
+                                    <input type="number" class="form-control" id="Discount_Purchases"
+                                        name="Discount_Purchases" required>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label" for="Total_Promo">Promo Offers Accepted</label>
+                                    <input type="number" class="form-control" id="Total_Promo" name="Total_Promo"
+                                        required>
+                                </div>
+                                <div class="col-12 mb-3">
+                                    <label class="form-label" for="NumWebVisitsMonth">Monthly Website Visits</label>
+                                    <input type="number" class="form-control" id="NumWebVisitsMonth"
+                                        name="NumWebVisitsMonth" required>
+                                </div>
+                            </div>
+
+                            <button class="btn-predict" type="submit">Unlock Customer Insights</button>
+                        </form>
+
+                        {% if context is not none %}
+                        <div class="result-box text-center">
+                            <span class="cluster-text">Result Profile: Cluster {{context}}</span>
+                        </div>
+                        {% endif %}
                     </div>
-                    
-                </form>
-            </div>
-            <div class="text-center text-black">
-                <h2 class="display-4 fw-bolder">Customer is in Cluster : {{context}} </h2>
+                </div>
             </div>
         </div>
     </section>
-    <script src="https://code.jquery.com/jquery-3.2.1.js"></script>
-    <script type="text/javascript">
-        $(".input").focus(function(){
-            $(this).parent().addClass("focus");
-        }).blur(function(){
-            if($(this).val() === ''){
-                $(this).parent().removeClass("focus");
-            }
-        })
-    </script>
-  </body>
+</body>
+
 </html>

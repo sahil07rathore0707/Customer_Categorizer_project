@@ -118,10 +118,18 @@ async def predictRouteClient(request: Request):
         predicted_cluster = prediction_pipeline.run_pipeline(input_data=input_data)
         
         predicted_value = int(predicted_cluster[0])
+
+        # Map cluster values to human-readable categories
+        cluster_mapping = {
+            0: "BUDGET CUSTOMER",
+            1: "PLATINUM CUSTOMER",
+            2: "MODERATE SPENDER"
+        }
+        category_name = cluster_mapping.get(predicted_value, f"CLUSTER {predicted_value}")
         
         return templates.TemplateResponse(
-            "customer.html",
-            {"request": request, "context": predicted_value}
+            "result.html",
+            {"request": request, "category": category_name}
         )
 
     except Exception as e:

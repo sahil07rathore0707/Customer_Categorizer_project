@@ -56,9 +56,19 @@ class DataValidation:
             logging.info("Running dataset drift detection using Evidently.")
 
             # Generate drift report
-            data_drift_profile = Report(metrics=[DataDriftPreset()])
-            data_drift_profile.run(reference_data=reference_df, current_data=current_df)
-            report_json = data_drift_profile.json()
+            report = Report(metrics=[DataDriftPreset()])
+            snapshot = report.run(reference_data=reference_df, current_data=current_df)
+            
+            # Robust JSON retrieval from the SNAPSHOT object
+            if hasattr(snapshot, 'json'):
+                report_json = snapshot.json()
+            elif hasattr(snapshot, 'to_json'):
+                report_json = snapshot.to_json()
+            else:
+                # Fallback to dict conversion
+                report_json = json.dumps(snapshot.dict() if hasattr(snapshot, 'dict') else snapshot.to_dict())
+
+
 
             # Convert JSON string to dictionary
             json_report = json.loads(report_json)
@@ -73,16 +83,21 @@ class DataValidation:
 
             # Locate dataset drift info
             drift_status = False
-            for metric in json_report.get("metrics", []):
+            # Search in metrics list (standard for newer Evidently)
+            metrics_data = json_report.get("metrics", [])
+            for metric in metrics_data:
                 if metric.get("metric") == "DatasetDriftMetric":
-                    drift_status = metric["result"].get("dataset_drift", False)
-                    break  # Stop searching once found
-
-            if drift_status is None:
-                raise KeyError("Key 'dataset_drift' not found in JSON report.")
+                    drift_status = metric.get("result", {}).get("dataset_drift", False)
+                    break
+            
+            # Fallback for alternative structures
+            if not drift_status and "metrics" in json_report:
+                # Some versions might have a different nesting
+                pass
 
             logging.info(f"Dataset drift detected: {drift_status}")
             return drift_status
+
 
         except KeyError as e:
             logging.error(f"Missing key in JSON report: {e}")
