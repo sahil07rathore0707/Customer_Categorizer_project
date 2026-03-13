@@ -15,28 +15,42 @@ body {
     margin: 0;
     padding: 0;
     font-family: 'Inter', sans-serif;
-    background: radial-gradient(circle at center, #3d2b23 0%, #2e211b 100%);
     min-height: 100vh;
     color: var(--text-white);
     overflow-x: hidden;
+    background-image: linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.6)), url('../images/background.png');
+    background-size: cover;
+    background-position: center;
+    background-attachment: fixed;
+    background-repeat: no-repeat;
 }
 
 .navbar {
-    background: rgba(46, 33, 27, 0.9) !important;
-    backdrop-filter: blur(10px);
-    border-bottom: 2px solid var(--accent-primary);
-    padding: 1rem 0;
+    background: var(--accent-primary) !important;
+    border-bottom: 2px solid rgba(255, 255, 255, 0.2);
+    padding: 1.2rem 0;
+    position: fixed;
+    width: 100%;
+    top: 0;
+    z-index: 1000;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.6);
 }
 
 .navbar-brand {
-    color: var(--accent-primary) !important;
-    font-size: 1.5rem;
-    letter-spacing: 3px;
+    color: #ffffff !important;
+    font-size: 2.8rem;
+    font-weight: 900;
+    letter-spacing: 6px;
     text-transform: uppercase;
+    margin: 0 auto !important;
+    display: inline-block;
+    white-space: nowrap;
+    text-shadow: 0 0 15px rgba(255, 255, 255, 0.4);
 }
 
 .main-section {
-    padding: 60px 0;
+    padding: 160px 0;
+    /* More padding for larger banner */
 }
 
 /* Glassmorphism Container */
@@ -125,7 +139,7 @@ select.form-control option {
 
 .cluster-text {
     font-size: 1.8rem;
-    font-weight: 800;
+    font-weight: 300;
     color: var(--accent-primary);
     letter-spacing: 1px;
 }
