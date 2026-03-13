@@ -4,20 +4,20 @@ dill==0.3.5.1
 dnspython==2.2.1
 matplotlib
 seaborn
-evidently==0.4.16
-fastapi==0.78.0
+evidently>=0.7.0
+fastapi>=0.115.0
 from-root==1.0.2
 httptools==0.5.0
-imblearn==0.0
+imbalanced-learn
 mypy-boto3-s3==1.24.76
 pip-chill==1.0.1
 pymongo==4.2.0
 jinja2
 python-dotenv==0.21.0
 types-s3transfer==0.6.0.post4
-uvicorn==0.18.3
+uvicorn>=0.30.0
 watchfiles==0.17.0
-websockets==10.3
+websockets>=10.4
 # wincertstore==0.2
 xgboost==1.6.2
 catboost

@@ -1,11 +1,13 @@
-from fastapi import FastAPI, Request, HTTPException
+from fastapi import FastAPI, Request, HTTPException, UploadFile, File
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import JSONResponse
+from fastapi.responses import JSONResponse, FileResponse
 from fastapi.templating import Jinja2Templates
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
 from dotenv import load_dotenv
 import os
+import io
+import pandas as pd
 
 from src.pipeline.prediction_pipeline import PredictionPipeline
 from src.pipeline.train_pipeline import TrainPipeline
@@ -83,6 +85,30 @@ async def test_env():
     return {"MONGODB_URL": mongo_url}
 
 
+# ✅ Dashboard API
+@app.get("/dashboard")
+async def dashboard(request: Request):
+    try:
+        # Provide some initial data for the dashboard
+        # In a real scenario, these could be calculated from the DB or artifacts
+        context = {
+            "request": request,
+            "total_customers": 2240,
+            "avg_income": 52.2,
+            "platinum_count": 450,
+            "avg_spending": 605,
+            "segments": ["Budget Customer", "Platinum Customer", "Moderate Spender"],
+            "counts": [1100, 450, 690],
+            "algo_labels": ["Random Forest", "XGBClassifier", "Logistic Regression", "SVM"],
+            "algo_accuracy": [0.9710, 0.9665, 0.9554, 0.9174],
+            "algo_precision": [0.9717, 0.9669, 0.9561, 0.9200],
+            "algo_f1": [0.9711, 0.9666, 0.9555, 0.9178]
+        }
+        return templates.TemplateResponse("dashboard.html", context)
+    except Exception as e:
+        return JSONResponse(content={"status": False, "error": str(e)}, status_code=500)
+
+
 # ✅ Render Customer Form (UI)
 @app.get("/")
 async def predictGetRouteClient(request: Request):
@@ -130,6 +156,54 @@ async def predictRouteClient(request: Request):
         return templates.TemplateResponse(
             "result.html",
             {"request": request, "category": category_name}
+        )
+
+    except Exception as e:
+        return JSONResponse(content={"status": False, "error": str(e)}, status_code=500)
+
+
+@app.get("/predict_batch")
+async def predict_batch_get(request: Request):
+    try:
+        return templates.TemplateResponse("batch.html", {"request": request})
+    except Exception as e:
+        return JSONResponse(content={"status": False, "error": str(e)}, status_code=500)
+
+
+@app.post("/predict_batch")
+async def predict_batch(file: UploadFile = File(...)):
+    try:
+        # Read uploaded file - use sep=None to auto-detect delimiters (comma, tab, etc.)
+        df = pd.read_csv(file.file, sep=None, engine='python')
+        
+        # Run prediction
+        prediction_pipeline = PredictionPipeline()
+        predictions = prediction_pipeline.predict_batch(df)
+        
+        # Add predictions to dataframe
+        df['predicted_cluster'] = predictions
+        
+        # Map cluster values to human-readable categories
+        cluster_mapping = {
+            0: "BUDGET CUSTOMER",
+            1: "PLATINUM CUSTOMER",
+            2: "MODERATE SPENDER"
+        }
+        df['category'] = df['predicted_cluster'].map(cluster_mapping)
+        
+        # Convert to CSV for download
+        output = io.StringIO()
+        df.to_csv(output, index=False)
+        output.seek(0)
+        
+        # Save to a temporary file to return as response
+        temp_file_path = "batch_predictions.csv"
+        df.to_csv(temp_file_path, index=False)
+        
+        return FileResponse(
+            path=temp_file_path, 
+            filename="customer_segments.csv",
+            media_type="text/csv"
         )
 
     except Exception as e:

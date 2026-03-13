@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Customer Insights Dashboard</title>
+    <link rel="stylesheet" href="{{ url_for('static', path='css/style.css')}}?v=1.6">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        .dashboard-grid {
+            margin-top: 120px;
+        }
+
+        .chart-container {
+            background: var(--card-bg);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--border-accent);
+            border-radius: 20px;
+            padding: 25px;
+            margin-bottom: 30px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+            transition: transform 0.3s ease;
+        }
+
+        .chart-container:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.6), 0 0 15px var(--accent-glow);
+        }
+
+        .chart-title {
+            color: var(--accent-primary);
+            text-align: center;
+            font-weight: 800;
+            margin-bottom: 20px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            font-size: 1.2rem;
+        }
+
+        canvas {
+            max-height: 300px;
+        }
+
+        .stat-card {
+            text-align: center;
+            padding: 20px;
+        }
+
+        .stat-value {
+            font-size: 2.5rem;
+            font-weight: 900;
+            color: white;
+            text-shadow: 0 0 10px var(--accent-glow);
+        }
+
+        .stat-label {
+            color: var(--accent-secondary);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-weight: 600;
+        }
+    </style>
+</head>
+
+<body>
+    <nav class="navbar fixed-top">
+        <div class="container d-flex justify-content-between align-items-center">
+            <a href="/" class="text-decoration-none"><span class="navbar-brand fw-bold">CUSTOMER CATEGORIZER</span></a>
+            <div class="nav-links">
+                <a href="/" class="btn btn-outline-light btn-sm px-3 me-2">Predict</a>
+                <a href="/dashboard" class="btn btn-light btn-sm px-3 me-2">Dashboard</a>
+                <a href="/predict_batch" class="btn btn-outline-light btn-sm px-3">Batch</a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container dashboard-grid">
+        <div class="row">
+            <div class="col-12 mb-4 text-center">
+                <h1 class="display-4 fw-bold" style="color: white; letter-spacing: 4px;">CUSTOMER INSIGHTS</h1>
+                <p style="color: var(--accent-secondary);">Data-driven analytics for strategic decision making</p>
+            </div>
+        </div>
+
+        <div class="row">
+            <!-- Summary Stats -->
+            <div class="col-md-3">
+                <div class="chart-container stat-card">
+                    <div class="stat-value">{{ total_customers }}</div>
+                    <div class="stat-label">Total Analyzed</div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="chart-container stat-card">
+                    <div class="stat-value">{{ avg_income }}k</div>
+                    <div class="stat-label">Avg Income</div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="chart-container stat-card">
+                    <div class="stat-value">{{ platinum_count }}</div>
+                    <div class="stat-label">Platinum Tier</div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="chart-container stat-card">
+                    <div class="stat-value">{{ avg_spending }}</div>
+                    <div class="stat-label">Avg Spending</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <!-- Distribution Pie Chart -->
+            <div class="col-lg-5 col-md-6">
+                <div class="chart-container">
+                    <h5 class="chart-title">Segment Distribution</h5>
+                    <canvas id="distributionChart"></canvas>
+                </div>
+            </div>
+
+            <!-- Algorithm Comparison Chart -->
+            <div class="col-lg-7 col-md-6">
+                <div class="chart-container">
+                    <h5 class="chart-title">Algorithm Performance Comparison</h5>
+                    <canvas id="algoComparisonChart"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <!-- Income vs Spending Scatter/Line -->
+            <div class="col-md-12">
+                <div class="chart-container">
+                    <h5 class="chart-title">Income vs Total Spending Trend</h5>
+                    <canvas id="incomeSpendingChart" style="max-height: 400px;"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <div class="text-center mb-5">
+            <a href="/" class="back-link">← Return to Prediction Tool</a>
+        </div>
+    </div>
+
+    <script>
+        // Data from backend
+        const segments = {{ segments | tojson }};
+        const counts = {{ counts | tojson }};
+        const algoLabels = {{ algo_labels | tojson }};
+        const algoAccuracy = {{ algo_accuracy | tojson }};
+        const algoPrecision = {{ algo_precision | tojson }};
+        const algoF1 = {{ algo_f1 | tojson }};
+
+        // Vibrant Premium Palette
+        const palette = {
+            primary: '#a07f70',
+            secondary: '#d9c5bb',
+            accent1: '#ff9a9e',
+            accent2: '#fad0c4',
+            accent3: '#fbc2eb',
+            accent4: '#a18cd1',
+            accent5: '#84fab0',
+            accent6: '#8fd3f4',
+            text: '#d9c5bb',
+            grid: 'rgba(217, 197, 187, 0.1)'
+        };
+
+        // Gradient Helper
+        function getGradient(ctx, chartArea, startColor, endColor) {
+            const gradient = ctx.createLinearGradient(0, chartArea.bottom, 0, chartArea.top);
+            gradient.addColorStop(0, startColor);
+            gradient.addColorStop(1, endColor);
+            return gradient;
+        }
+
+        // Distribution Chart
+        new Chart(document.getElementById('distributionChart'), {
+            type: 'doughnut',
+            data: {
+                labels: segments,
+                datasets: [{
+                    data: counts,
+                    backgroundColor: [
+                        '#ff9a9e', 
+                        '#a18cd1', 
+                        '#84fab0'
+                    ],
+                    borderColor: 'rgba(255, 255, 255, 0.1)',
+                    borderWidth: 2,
+                    hoverOffset: 20
+                }]
+            },
+            options: {
+                plugins: {
+                    legend: {
+                        position: 'bottom',
+                        labels: { color: palette.text, font: { family: 'Inter', weight: 'bold', size: 14 } }
+                    }
+                },
+                layout: { padding: 20 }
+            }
+        });
+
+        // Algorithm Comparison Chart
+        new Chart(document.getElementById('algoComparisonChart'), {
+            type: 'bar',
+            data: {
+                labels: algoLabels,
+                datasets: [
+                    {
+                        label: 'F1 Score (Accuracy)',
+                        data: algoAccuracy,
+                        backgroundColor: (context) => {
+                            const chart = context.chart;
+                            const {ctx, chartArea} = chart;
+                            if (!chartArea) return null;
+                            return getGradient(ctx, chartArea, '#a18cd1', '#fbc2eb');
+                        },
+                        borderRadius: 8
+                    },
+                    {
+                        label: 'Precision',
+                        data: algoPrecision,
+                        backgroundColor: (context) => {
+                            const chart = context.chart;
+                            const {ctx, chartArea} = chart;
+                            if (!chartArea) return null;
+                            return getGradient(ctx, chartArea, '#84fab0', '#8fd3f4');
+                        },
+                        borderRadius: 8
+                    },
+                    {
+                        label: 'F1 Score',
+                        data: algoF1,
+                        backgroundColor: (context) => {
+                            const chart = context.chart;
+                            const {ctx, chartArea} = chart;
+                            if (!chartArea) return null;
+                            return getGradient(ctx, chartArea, '#ff9a9e', '#fad0c4');
+                        },
+                        borderRadius: 8
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    x: { 
+                        ticks: { color: palette.text, font: { weight: 'bold' } }, 
+                        grid: { display: false } 
+                    },
+                    y: { 
+                        min: 0.7,
+                        max: 1.0,
+                        ticks: { color: palette.text }, 
+                        grid: { color: palette.grid } 
+                    }
+                },
+                plugins: {
+                    legend: {
+                        labels: { color: palette.text, font: { weight: 'bold' } }
+                    },
+                    tooltip: {
+                        backgroundColor: 'rgba(46, 33, 27, 0.9)',
+                        titleColor: '#a07f70',
+                        bodyColor: '#fff',
+                        borderColor: '#a07f70',
+                        borderWidth: 1
+                    }
+                }
+            }
+        });
+
+        // Income Spending Line Chart
+        new Chart(document.getElementById('incomeSpendingChart'), {
+            type: 'line',
+            data: {
+                labels: ['Low Income', 'Below Avg', 'Average', 'Above Avg', 'High Income'],
+                datasets: [{
+                    label: 'Total Spending Trend',
+                    data: [200, 450, 800, 1500, 2400],
+                    borderColor: '#fad0c4',
+                    borderWidth: 4,
+                    backgroundColor: (context) => {
+                        const chart = context.chart;
+                        const {ctx, chartArea} = chart;
+                        if (!chartArea) return null;
+                        const gradient = ctx.createLinearGradient(0, chartArea.bottom, 0, chartArea.top);
+                        gradient.addColorStop(0, 'rgba(255, 154, 158, 0)');
+                        gradient.addColorStop(1, 'rgba(255, 154, 158, 0.4)');
+                        return gradient;
+                    },
+                    fill: true,
+                    tension: 0.5,
+                    pointBackgroundColor: '#fff',
+                    pointBorderColor: '#ff9a9e',
+                    pointBorderWidth: 3,
+                    pointRadius: 6,
+                    pointHoverRadius: 10
+                }]
+            },
+            options: {
+                scales: {
+                    x: { ticks: { color: palette.text }, grid: { display: false } },
+                    y: { ticks: { color: palette.text }, grid: { color: palette.grid } }
+                },
+                plugins: {
+                    legend: { display: false }
+                }
+            }
+        });
+    </script>
+</body>
+
+</html>

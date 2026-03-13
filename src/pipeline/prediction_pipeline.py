@@ -85,6 +85,8 @@ class PredictionPipeline:
         
             
             customerDataframe = CustomerData.form_input_dataframe(data = input_data)
+            # Handle potential NaNs by filling with 0 (consistent with trainer config)
+            customerDataframe.fillna(0, inplace=True)
             logging.info("customerDatafram has been created")
             return customerDataframe
         except Exception as e:
@@ -136,6 +138,96 @@ class PredictionPipeline:
             prediction = model.predict(input_dataframe)
             return prediction
             
+        except Exception as e:
+            raise CustomerException(e, sys)
+
+    def prepare_batch_data(self, dataset: pd.DataFrame) -> pd.DataFrame:
+        """
+        method: prepare_batch_data
+        objective: Replicate feature engineering from DataTransformation.get_new_features
+        """
+        try:
+            from datetime import datetime
+            
+            # 1. Age
+            if 'Year_Birth' in dataset.columns:
+                dataset['Age'] = datetime.today().year - dataset['Year_Birth']
+            
+            # 2. Education mapping
+            if 'Education' in dataset.columns:
+                dataset["Education"].replace({"Basic":0,"2n Cycle":1, "Graduation":2, "Master":3, "PhD":4}, inplace=True)
+            
+            # 3. Marital Status mapping
+            if 'Marital_Status' in dataset.columns:
+                dataset['Marital Status'] = dataset['Marital_Status'].replace({"Married":1, "Together":1, "Absurd":0, "Widow":0, "YOLO":0, "Divorced":0, "Single":0,"Alone":0})
+            
+            # 4. Children & Parental Status
+            if 'Kidhome' in dataset.columns and 'Teenhome' in dataset.columns:
+                dataset['Children'] = dataset['Kidhome'] + dataset['Teenhome']
+                dataset["Parental Status"] = np.where(dataset["Children"] > 0, 1, 0)
+
+            # 5. Total Spending
+            spending_cols = ["MntWines", "MntFruits", "MntMeatProducts", "MntFishProducts", "MntSweetProducts", "MntGoldProds"]
+            if all(col in dataset.columns for col in spending_cols):
+                dataset['Total_Spending'] = dataset[spending_cols].sum(axis=1)
+                # Rename for model consistency
+                dataset.rename(columns={
+                    "MntWines": "Wines", "MntFruits":"Fruits", "MntMeatProducts":"Meat",
+                    "MntFishProducts":"Fish", "MntSweetProducts":"Sweets", "MntGoldProds":"Gold"
+                }, inplace=True)
+
+            # 6. Total Promo
+            promo_cols = ["AcceptedCmp1", "AcceptedCmp2", "AcceptedCmp3", "AcceptedCmp4", "AcceptedCmp5"]
+            if all(col in dataset.columns for col in promo_cols):
+                dataset["Total Promo"] = dataset[promo_cols].sum(axis=1)
+
+            # 7. Days as Customer
+            if 'Dt_Customer' in dataset.columns:
+                dataset['Dt_Customer'] = pd.to_datetime(dataset['Dt_Customer'], format="%d-%m-%Y", errors="coerce")
+                dataset['Days_as_Customer'] = (datetime.today() - dataset['Dt_Customer']).dt.days
+
+            # 8. Channel Renaming
+            dataset.rename(columns={
+                "NumWebPurchases": "Web", "NumCatalogPurchases":"Catalog",
+                "NumStorePurchases":"Store", "NumDealsPurchases":"Discount Purchases",
+                "NumWebVisitsMonth": "NumWebVisitsMonth"
+            }, inplace=True)
+
+            # 9. Column selection and ordering as expected by preprocessor
+            final_cols = [
+                "Age","Education","Marital Status","Parental Status",
+                "Children","Income","Total_Spending","Days_as_Customer",
+                "Recency","Wines","Fruits","Meat","Fish","Sweets","Gold",
+                "Web","Catalog","Store","Discount Purchases","Total Promo",
+                "NumWebVisitsMonth"
+            ]
+            
+            # Filter for only those columns that exist in dataset and fill missing columns with 0
+            for col in final_cols:
+                if col not in dataset.columns:
+                    dataset[col] = 0
+            
+            # Select final columns and fill potential NaNs in existing data with 0
+            final_df = dataset[final_cols].fillna(0)
+            
+            return final_df
+
+        except Exception as e:
+            raise CustomerException(e, sys)
+
+    def predict_batch(self, input_dataframe: pd.DataFrame):
+        """
+        method: predict_batch
+        
+        objective: predict_batch method runs the prediction for a whole dataframe.
+        """
+        try:
+            # Preprocess the raw CSV data to match training features
+            prepared_df = self.prepare_batch_data(input_dataframe)
+            
+            model = self.get_trained_model()
+            prediction = model.predict(prepared_df)
+            return prediction
         except Exception as e:
             raise CustomerException(e, sys)
             

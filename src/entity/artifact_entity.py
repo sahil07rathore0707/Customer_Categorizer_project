@@ -29,6 +29,7 @@ class ClassificationMetricArtifact:
     f1_score:float
     precision_score:float
     recall_score:float
+    silhouette_score:float = 0.0
 
 
 @dataclass

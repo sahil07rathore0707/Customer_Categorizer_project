@@ -30,8 +30,13 @@
 
 <body>
     <nav class="navbar fixed-top">
-        <div class="container text-center">
-            <span class="navbar-brand fw-bold">CUSTOMER CATEGORIZER</span>
+        <div class="container d-flex justify-content-between align-items-center">
+            <a href="/" class="text-decoration-none"><span class="navbar-brand fw-bold">CUSTOMER CATEGORIZER</span></a>
+            <div class="nav-links">
+                <a href="/" class="btn btn-outline-light btn-sm px-3 me-2">Predict</a>
+                <a href="/dashboard" class="btn btn-outline-light btn-sm px-3 me-2">Dashboard</a>
+                <a href="/predict_batch" class="btn btn-outline-light btn-sm px-3">Batch</a>
+            </div>
         </div>
     </nav>
     <div class="container">
@@ -46,7 +51,20 @@
                         <p style="font-size: 1.1rem; line-height: 1.6; color: #ddd;">
                             Our advanced intelligence model has categorized your profile based on spending power,
                             loyalty, and demographic data.
-                            This segment represents high-value growth potential for data-driven strategic engagement.
+                        </p>
+                        <hr style="border-color: var(--border-accent)">
+                        <h5 style="color: var(--accent-primary); font-weight: bold;">Marketing Strategy:</h5>
+                        <p style="color: #bbb; line-height: 1.5;">
+                            {% if category == "PLATINUM CUSTOMER" %}
+                            Target with exclusive luxury gold offers and premium catalog invitations. Focus on wine and
+                            meat bundles.
+                            {% elif category == "MODERATE SPENDER" %}
+                            Engage with personalized web discounts and periodic store-wide sales. Good cross-sell
+                            potential for sweets and fruits.
+                            {% else %}
+                            Focus on budget-friendly discount deals and loyalty-based micro-promotions. Encourage more
+                            store visits.
+                            {% endif %}
                         </p>
                     </div>
 
